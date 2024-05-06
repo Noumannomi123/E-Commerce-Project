@@ -1,8 +1,12 @@
+import Navbar from "../../components/Navbar";
+import "./Instructor.css";
+
 const Home = () => {
+  const item: string[] = ["Home", "My Courses"];
   return (
-    <div className="text-center d-flex justify-content-center align-items-center vh-100">
-      <div className="fw-bold fs-1">Home Page Instrcutor </div>
-    </div>
+    <>
+      <Navbar items={item} />
+    </>
   );
 };
 
