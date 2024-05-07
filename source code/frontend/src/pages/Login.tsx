@@ -25,7 +25,9 @@ const Login = () => {
     } catch (error: any) {
       console.log(error);
       if (error.response?.request.status === 404) alert("User not found");
-      if (error.response?.request.status === 401) alert("Invalid Password");
+      else if (error.response?.request.status === 401)
+        alert("Invalid Password");
+      else alert("Something went wrong.");
     }
   };
 
