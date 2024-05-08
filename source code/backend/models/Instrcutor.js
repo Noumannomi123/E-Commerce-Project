@@ -1,11 +1,7 @@
 import mongoose from "mongoose";
 
 const instructorSchema = mongoose.model({
-    name: {
-        type: String,
-        required: true
-    },
-    email: {
+    username: {
         type: String,
         required: true,
         unique: true,
