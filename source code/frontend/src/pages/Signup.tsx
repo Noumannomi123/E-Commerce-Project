@@ -39,8 +39,15 @@ const Signup = () => {
       else alert("An error occurred while signing up. Check console.");
     }
   };
-  const options =["Select User Type", "Instructor", "Student", "Admin"]
-  return <Sign heading="Sign up" options={options} onHandleSubmit={handleSubmit} />;
+  const options = ["Select User Type", "Instructor", "Student", "Admin"];
+  return (
+    <Sign
+      heading="Sign up"
+      options={options}
+      onHandleSubmit={handleSubmit}
+      heading2="Log in"
+    />
+  );
 };
 
 export default Signup;

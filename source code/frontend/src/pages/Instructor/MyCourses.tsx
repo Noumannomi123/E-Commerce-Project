@@ -1,12 +1,24 @@
+import { useNavigate } from "react-router-dom";
 import picname from "../../assets/user.png";
 import Navbar from "../../components/Navbar";
+import { useEffect } from "react";
 const MyCourses = () => {
-  const item: string[] = ["Home", "My Courses"];
-  const name = "Instructor";
-
+  // if
+  const items = ["Home", "My Courses"];
+  const routes = ["/Instructor/Home", "/Instructor/MyCourses"];
+  // check if username exists in the local storage\
+  const username = localStorage.getItem("username");
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!username) {
+      navigate("/user/login");
+    }
+  }, [username]);
+  const name = "Instructor"; // match with username
+  console.log("user: " + username);
   return (
     <>
-      <Navbar items={item} />
+      <Navbar items={items} routes={routes} />
       <div className="container my-5">
         <img src={picname} alt="Profile picture" className="img-fluid h-100" />
         <h1>{name}</h1>

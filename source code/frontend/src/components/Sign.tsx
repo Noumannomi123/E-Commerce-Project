@@ -1,7 +1,9 @@
 import { useState } from "react";
 import logo from "../assets/logo.avif";
+import { Link } from "react-router-dom";
 interface Props {
   heading: string;
+  heading2: string;
   onHandleSubmit: (
     e: React.FormEvent,
     username: string,
@@ -21,13 +23,16 @@ const Signup = (props: Props) => {
     e.preventDefault();
     props.onHandleSubmit(e, username, email, password, usertype);
   };
+  const getDestination = () => {
+    return props.heading2 === "Sign up" ? "/user/signup" : "/user/login";
+  };
   return (
     <>
       <div className="d-flex justify-content-center align-items-center bg-body-tertiary py-4 vh-100">
         <div className="form-signin w-25 m-25 text-center ">
           <form className="col-12" onSubmit={handleSubmit}>
             <h1 className="h3 mb-3 fw-normal">{props.heading}</h1>
-            <img src={logo} alt="Logo" height={200} width={200}/>
+            <img src={logo} alt="Logo" height={200} width={200} />
             <div className="form-floating">
               <input
                 type="text"
@@ -98,6 +103,9 @@ const Signup = (props: Props) => {
             <button className="btn btn-primary w-100 py-2" type="submit">
               {props.heading}
             </button>
+            <Link to={getDestination()} className="btn fw-semi-bold w-25 mt-3">
+              {props.heading2}
+            </Link>
           </form>
         </div>
       </div>

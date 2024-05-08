@@ -12,13 +12,14 @@ const Login = () => {
   ) => {
     e.preventDefault();
     try {
-      await axios.post("http://localhost:5555/user/login", {
+      const response = await axios.post("http://localhost:5555/user/login", {
         username,
         email,
         password,
         usertype,
       });
-      alert("Logged in successfully");
+      const { data } = response;
+      localStorage.setItem("username", data.username);
       if (usertype === "Instructor") navigate("/Instructor/Home");
       if (usertype === "Student") navigate("/Student/Home");
       if (usertype === "Admin") navigate("/Admin/Home");
@@ -33,7 +34,12 @@ const Login = () => {
 
   const options = ["Select User Type", "Instructor", "Student", "Admin"];
   return (
-    <Sign heading="Log in" options={options} onHandleSubmit={handleSubmit} />
+    <Sign
+      heading="Log in"
+      options={options}
+      onHandleSubmit={handleSubmit}
+      heading2="Sign up"
+    />
   );
 };
 
