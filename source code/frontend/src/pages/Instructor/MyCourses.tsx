@@ -6,7 +6,7 @@ const MyCourses = () => {
   // if
   const items = ["Home", "My Courses"];
   const routes = ["/Instructor/Home", "/Instructor/MyCourses"];
-  // check if username exists in the local storage\
+  // check if username exists in the local storage
   const username = localStorage.getItem("username");
   const navigate = useNavigate();
   useEffect(() => {
