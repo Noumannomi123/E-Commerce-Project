@@ -12,8 +12,9 @@ const coursesSchema = mongoose.Schema(
         description: { type: String, required: false },
         price: { type: Number, required: true },
         image: { type: String, required: false },// path to image
-        teacher_username: { type: String, required: true, unique: true, index: true },
-        enrollments: { type: Number, required: true },
+        teacher_username: { type: String, required: true, unique: false, index: true },
+        enrollments: [{ type: String, required: false }],
+        // assignmetns, quizes
         courseMaterials: [courseMaterialSchema]
     },
     {

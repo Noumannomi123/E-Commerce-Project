@@ -1,84 +1,3 @@
-// import express from 'express'
-// import { PORT, mongoDBURL } from './config.js';
-// import mongoose from 'mongoose';
-// const app = express();
-// import { User } from './models/User.js';
-// import cors from 'cors';
-// // import { Courses } from './models/Courses.js';
-// app.use(express.json());
-// app.use(cors());
-
-
-// app.post('/user/signup', async (req, res) => {
-//     try {
-//         // handle form validation on frontend
-//         const newUser = {
-//             username: req.body.username,
-//             email: req.body.email,
-//             password: req.body.password,
-//             usertype: req.body.usertype,
-//         }
-//         // instructor
-//         // if newUser.usertype == ""
-//         const user = await User.create(newUser);
-//         return res.status(201).send(user);
-//     }
-//     catch (error) {
-//         if (error.code === 11000) {
-//             res.status(400).send({ error: 'User already exists' });
-//         } else {
-//             res.status(500).send({ error: 'Error creating user. Check the parameters' });
-//         }
-//     }
-// });
-
-// app.post('/user/login', async (req, res) => {
-//     try {
-//         console.log(req.body);
-//         if (!req.body.email || !req.body.password) {
-//             return res.status(400).send({ error: 'Missing email or password' });
-//         }
-//         const user = await User.findOne({ email: req.body.email, usertype: req.body.usertype });
-//         if (!user) {
-//             return res.status(404).send({ error: 'User not found' });
-//         }
-//         if (user.password !== req.body.password) {
-//             return res.status(401).send({ error: 'Invalid password' });
-//         }
-//         return res.status(200).send(user);
-//     }
-//     catch (error) {
-//         res.status(500).send({ error: 'Error logging in' });
-//     }
-// });
-
-
-
-// // create courses
-// app.post('/user/createCourse', async (req, res) => {
-//     try {
-//         const course = await Course.create(req.body);
-//         return res.status(201).send(course);
-//     }
-//     catch (error) {
-//         res.status(500).send({ error: 'Error creating course' });
-//     }
-// });
-
-
-// // app.post() to create a course based on a username of teacher
-
-
-// mongoose
-//     .connect(mongoDBURL)
-//     .then(() => {
-//         console.log('App connected to database');
-//         app.listen(PORT, () => {
-//             console.log(`Server on port ${PORT}`);
-//         });
-//     })
-//     .catch(err => console.log(err));
-
 import express from 'express';
 import mongoose from 'mongoose';
 import bcrypt from 'bcryptjs';
@@ -134,16 +53,102 @@ app.get('/user/logout', (req, res) => {
 })
 // Protected route example
 // create courses
-app.post('/user/createCourse', authenticateAndCheckUserType, async (req, res) => {
+/* 
+instructor creates a course
+each course has a teacher_username to identify the course
+each course has a count of enrollments
+1. auth
+*/
+
+app.get('/instructor/courses/:username'/*, authenticateAndCheckUserType*/, async (req, res) => {
+    try {// return all courses of teacher
+        const courses = await Courses.find({ teacher_username: req.params.username });
+        res.status(200).json({ count: courses.length, list: courses });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error retrieving courses' });
+    }
+});
+
+app.post('/instructor/createCourse'/*, authenticateAndCheckUserType*/, async (req, res) => {
     try {
-        const course = await Courses.create(req.body);
-        return res.status(201).send(course);
+        const { title, description, price, image, enrollments, courseMaterials } = req.body;
+        const username = req.body.teacher_username;
+
+        // Validate the input data
+        if (!title || !price || !username) {
+            return res.status(400).send({ error: 'Missing required fields' });
+        }
+
+        // Create a new course
+        const course = await Courses.create({
+            title,
+            description,
+            price,
+            image,
+            teacher_username: username,
+            enrollments,
+            courseMaterials
+        });
+
+        res.status(201).send(course);
     }
     catch (error) {
+        console.error(error);
         res.status(500).send({ error: 'Error creating course' });
     }
 });
 
+app.put('/instructor/updateCourse/:id' /*, authenticateAndCheckUserType*/, async (req, res) => {
+    try {//update courses based on course id
+        const { title, description, price, image, enrollments, courseMaterials } = req.body;
+        const username = req.body.teacher_username;
+        const id = req.params.id;
+
+        // Validate the input data
+        if (!title || !price || !username) {
+            return res.status(400).send({ error: 'Missing required fields' });
+        }
+
+        // Update the course
+        const course = await Courses.findByIdAndUpdate(id, {
+            title,
+            description,
+            price,
+            image,
+            teacher_username: username,
+            enrollments,
+            courseMaterials
+        }, { new: true });
+
+        if (!course) {
+            return res.status(404).send({ error: 'Course not found' });
+        }
+
+        res.status(200).send(course);
+        console.log(course);
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).send({ error: 'Error updating course' });
+    }
+});
+
+// delete course by id
+app.delete('/instructor/deleteCourse/:id' /*, authenticateAndCheckUserType*/, async (req, res) => {
+    try {// delete based on course id
+        const id = req.params.id;
+        const course = await Courses.findByIdAndDelete(id);
+        if (!course) {
+            return res.status(404).send({ error: 'Course not found' });
+        }
+        res.status(200).send({ message: 'Course deleted successfully' });
+    }
+    catch (error) {
+        console.error(error);
+        res.status(500).send({ error: 'Error deleting course' });
+    }
+});
 
 // Middleware to authenticate token
 function authenticateAndCheckUserType(req, res, next) {
@@ -156,18 +161,26 @@ function authenticateAndCheckUserType(req, res, next) {
         if (err) {
             return res.status(401).json({ error: 'Invalid token' });
         }
-        req.userId = decoded.userId;
+        const userType = decoded.userType;
 
-        // Fetch the user from the database based on userId
-        User.findById(req.userId, (err, user) => {
-            if (err || !user) {
-                return res.status(401).json({ error: 'User not found' });
+        // Assuming you have a field called userType in your JWT payload
+        if (userType === 'Instructor') {
+            // Allow access to instructor API calls
+            if (req.url.startsWith('instructor')) {
+                return next();
+            } else {
+                return res.status(403).json({ error: 'Access denied. Only instructors are allowed' });
             }
-            if (user.usertype !== 'Instructor') {
-                return res.status(403).json({ error: 'Access denied. User is not an Instructor' });
+        } else if (userType === 'Student') {
+            // Allow access to student API calls
+            if (req.url.startsWith('student')) {
+                return next();
+            } else {
+                return res.status(403).json({ error: 'Access denied. Only students are allowed' });
             }
-            next();
-        });
+        } else {
+            return res.status(403).json({ error: 'Access denied. Unknown user type' });
+        }
     });
 }
 
