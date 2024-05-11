@@ -5,7 +5,9 @@ import Login from "./pages/Login";
 import "bootstrap/dist/css/bootstrap.css";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
-import MyCourses from "./pages/Instructor/MyCourses";
+import "./App.css";
+import AddCourse from "./pages/Instructor/AddCourse";
+import EditCourse from "./pages/Instructor/EditCourse";
 
 const App = () => {
   return (
@@ -15,7 +17,8 @@ const App = () => {
         <Route path="/user/signup" element={<Signup />} />
         <Route path="/user/login" element={<Login />} />
         <Route path="/Instructor/Home" element={<Home />} />
-        <Route path="/Instructor/MyCourses" element={<MyCourses />} />
+        <Route path="/Instructor/AddCourse" element={<AddCourse />} />
+        <Route path="/Instructor/EditCourse/:id" element={<EditCourse />} />
       </Routes>
     </>
   );
