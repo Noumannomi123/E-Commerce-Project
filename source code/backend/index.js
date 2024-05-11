@@ -60,26 +60,67 @@ each course has a count of enrollments
 1. auth
 */
 
+// get course by id
+app.get('/courses/:id' /*, authenticateAndCheckUserType*/, async (req, res) => {
+    try {
+        const course = await Courses.findById(req.params.id);
+        if (!course) {
+            return res.status(404).json({ error: 'Course not found' });
+        }
+        res.status(200).json(course);
+    } catch (error) {
+        res.status(500).json({ error: 'Error retrieving course' });
+    }
+});
+
 app.get('/instructor/courses/:username'/*, authenticateAndCheckUserType*/, async (req, res) => {
-    try {// return all courses of teacher
+    try {// return all courses of teacher 
         const courses = await Courses.find({ teacher_username: req.params.username });
+        // get length of courses field "enrollments"
         res.status(200).json({ count: courses.length, list: courses });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error retrieving courses' });
     }
 });
+// app.post('/instructor/createCourse'/*, authenticateAndCheckUserType*/, async (req, res) => {
+//     try {
+//         const { title, description, price, imageUrl, teacher_username, enrollments, materials } = req.body;
+//         // Validate the input data
+//         if (!title || !price || !teacher_username || !imageUrl) {
+//             return res.status(400).send({ error: 'Missing required fields' });
+//         }
+//         // Create a nesw course
+
+// const courseMaterialsArray = Array.isArray(materials) ? materials : [materials];
+//         const course = await Courses.create({
+//             title,
+//             description,
+//             price,
+//             image: imageUrl,
+//             teacher_username,
+//             enrollments,
+//             courseMaterials: courseMaterialsArray
+//         });
+//         console.log("Sending course:");
+//         console.log(course);
+//         res.status(201).send(course);
+//     }
+//     catch (error) {
+//         console.error(error);
+//         res.status(500).send({ error: 'Error creating course' });
+//     }
+// });
 
 app.post('/instructor/createCourse'/*, authenticateAndCheckUserType*/, async (req, res) => {
     try {
         const { title, description, price, image, enrollments, courseMaterials } = req.body;
         const username = req.body.teacher_username;
-
         // Validate the input data
         if (!title || !price || !username) {
             return res.status(400).send({ error: 'Missing required fields' });
         }
-
+        const courseMaterialsArray = Array.isArray(courseMaterials) ? courseMaterials : [courseMaterials];
         // Create a new course
         const course = await Courses.create({
             title,
@@ -88,13 +129,13 @@ app.post('/instructor/createCourse'/*, authenticateAndCheckUserType*/, async (re
             image,
             teacher_username: username,
             enrollments,
-            courseMaterials
+            courseMaterials: courseMaterialsArray
         });
 
         res.status(201).send(course);
     }
     catch (error) {
-        console.error(error);
+        console.log(error);;
         res.status(500).send({ error: 'Error creating course' });
     }
 });
