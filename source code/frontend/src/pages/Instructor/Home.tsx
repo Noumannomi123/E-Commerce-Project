@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import Navbar from "../../components/Navbar";
 import "./Instructor.css";
 import default_pic from "../../assets/default_course.webp";
@@ -40,7 +40,9 @@ interface Material {
 }
 
 const Home = () => {
-  // const navigate = useNavigate();
+  const { state } = useLocation();
+  const { username } = state;
+
   const [count, setCount] = useState(0);
   const [list, setList] = useState([]);
   const leastDestructiveRef = useRef(null); // Create a ref for the least destructive element
@@ -55,7 +57,14 @@ const Home = () => {
       console.log(error);
     }
   };
-  const courses = getCourses("nouman");
+
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!username) {
+      navigate("/user/login");
+    }
+  }, [username]);
+  const courses = getCourses(username);
   console.log(courses);
   useEffect(() => {
     courses.then((result) => {
@@ -63,24 +72,18 @@ const Home = () => {
       setList(result.list);
     });
   }, []);
-  const username = localStorage.getItem("username");
-  const navigate = useNavigate();
-  useEffect(() => {
-    if (!username) {
-      navigate("/user/login");
-    }
-  }, [username]);
 
   const item: string[] = ["Home", "Add Courses"];
-  const routes = ["/Instructor/Home", "/Instructor/AddCourse"];
+  const routes = ["/Instructor/Home", `/Instructor/AddCourse/${username}`];
   // const courses = getCourses("nouman");
   // len of enrollments
 
   // len of courseMaterials
+
   const editCourse = (id: string) => {
-    const listing  = list.find((course: Course) => course._id === id)
+    const listing = list.find((course: Course) => course._id === id);
     navigate(`/Instructor/EditCourse/${id}`, {
-      state: { listing: listing },
+      state: { listing: listing , username: username},
     });
   };
   const deleteCourse = async (id: string) => {
@@ -102,6 +105,7 @@ const Home = () => {
     }
     onClose(); // Close the confirmation dialog regardless of the outcome
   };
+
   return (
     <>
       <Navbar items={item} routes={routes} />
@@ -168,11 +172,21 @@ const Home = () => {
               </HStack>
               <HStack mt="10px">
                 <Box w="40%">
-                  <Image src={course.image || default_pic} w="100%" />
+                  {/* <Image src={course.image} w="100%" /> */}
+                  {course.image ? (
+                    <Image src={course.image} w="100%" />
+                  ) : (
+                    <Image
+                      src={default_pic} // Replace default_pic with the URL of your default image
+                      w="100%"
+                    />
+                  )}
                 </Box>
                 <VStack alignItems="flex-start" w="60%">
                   <Text>{course.description}</Text>
+                  <Text fontWeight="medium">Resources</Text>
                   <Text color="gray">{course.courseMaterials.length}</Text>
+
                   <HStack w="100%" justifyContent="flex-end">
                     <Button
                       bg="#5AB2FF"

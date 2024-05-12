@@ -47,10 +47,11 @@ const AddCourse = () => {
         courseMaterials: materials,
       });
       alert("Course created successfully");
+      // refresh page
+      window.location.reload();
     } catch (error: any) {
-      console.error("Error creating course:", error.message); // Log error with a message
+      console.error("Error creating course:", error.message);
       alert("Unable to create course. Try changing title.");
-      // Consider displaying an error message to the user or sending the error to a logging service
     }
   };
   return (

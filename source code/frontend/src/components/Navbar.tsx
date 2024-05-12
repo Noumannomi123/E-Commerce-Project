@@ -1,3 +1,4 @@
+import { useLocation, useNavigate } from "react-router-dom";
 import Logout from "./Logout";
 
 interface Props {
@@ -5,6 +6,14 @@ interface Props {
   routes: string[];
 }
 const Navbar = ({ items, routes }: Props) => {
+  const {state} = useLocation();
+  const {username} = state;
+  const navigate = useNavigate();
+  const handleNav = (route: string) =>{
+    navigate(route, {
+      state: {username: username}
+    });
+  }
   return (
     <>
       <nav className="navbar navbar-expand-lg ">
@@ -24,7 +33,7 @@ const Navbar = ({ items, routes }: Props) => {
             <ul className="navbar-nav me-auto mb-2 mb-lg-0">
               {items.map((item, index) => (
                 <li className="nav-item" key={index}>
-                  <a className="nav-link fw-semibold" href={routes[index]}>
+                  <a className="nav-link fw-semibold" onClick={() => {handleNav(routes[index])}}>
                     {item}
                   </a>
                 </li>

@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { useLocation } from "react-router-dom";
 
 interface Course {
   title: string;
@@ -60,6 +61,8 @@ const AddCourseForm = (props: Props) => {
     updatedMaterials.splice(index, 1);
     setMaterials(updatedMaterials);
   };
+  const { state } = useLocation();
+  const { username } = state;
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     // working
@@ -70,7 +73,7 @@ const AddCourseForm = (props: Props) => {
       description,
       price,
       imageUrl,
-      "nouman",
+      username,
       [],
       materials
     );
@@ -122,6 +125,7 @@ const AddCourseForm = (props: Props) => {
                 className="form-control"
                 placeholder="Enter Image URL"
                 onChange={(e) => setImageUrl(e.target.value)}
+                required={true}
                 value={imageUrl}
               />
               <label htmlFor="floatingImage">Image URL</label>

@@ -27,7 +27,9 @@ const Signup = () => {
       }
       if (usertype === "Student") {
         alert("Sign up successful as student\nLoggin in.");
-        navigate("/Student/Home");
+        navigate("/Student/Home", {
+          state: { username: username },
+        });
       }
       if (usertype === "Admin") {
         alert("Sign up successful as admin\nLoggin in.");

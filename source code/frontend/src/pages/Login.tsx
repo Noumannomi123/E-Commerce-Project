@@ -19,8 +19,10 @@ const Login = () => {
         usertype,
       });
       const { data } = response;
-      localStorage.setItem("username", data.username);
-      if (usertype === "Instructor") navigate("/Instructor/Home");
+      // localStorage.setItem("username", data.username);
+      if (usertype === "Instructor") navigate("/Instructor/Home",{
+        state: {username: data.username}
+      });
       if (usertype === "Student") navigate("/Student/Home");
       if (usertype === "Admin") navigate("/Admin/Home");
     } catch (error: any) {

@@ -1,12 +1,17 @@
 import axios from "axios";
 import AddCourseForm from "../../components/AddCourseForm";
 import Navbar from "../../components/Navbar";
-
-import { useLocation } from "react-router-dom";
+interface CourseMaterial {
+  title: string;
+  type: string;
+  url: string;
+}
+import { useLocation, useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 const EditCourse = () => {
   const { state } = useLocation();
   const { listing } = state;
-
+  const { username } = state;
   //   const { id } = useParams();
   //   const getCourse = async () => {
   //       await axios
@@ -22,16 +27,18 @@ const EditCourse = () => {
   //     }, []);
   const item: string[] = ["Home", "Add Courses"];
   const routes = ["/Instructor/Home", "/Instructor/AddCourse"];
-  const {
-    title,
-    description,
-    price,
-    imageUrl,
-    teacher_username,
-    enrollments,
-    materials,
-  } = listing;
-  const handleSubmit = async () => {
+  const navigate = useNavigate();
+  const handleSubmit = async (
+    e: React.FormEvent,
+    title: string,
+    description: string,
+    price: number,
+    imageUrl: string,
+    teacher_username: string,
+    enrollments: string[],
+    materials: CourseMaterial[]
+  ) => {
+    e.preventDefault();
     try {
       axios
         .put(`http://localhost:5555/instructor/updateCourse/${listing._id}`, {
@@ -49,9 +56,21 @@ const EditCourse = () => {
         .catch((error) => {
           console.error(error);
         });
-    } catch (error: any) {}
+      alert("Course updated successfully");
+      const username = teacher_username;
+      navigate("/instructor/Home", {
+        state: { username: username },
+      });
+    } catch (error: any) {
+      console.error(error);
+    }
   };
 
+  useEffect(() => {
+    if (!username) {
+      navigate("/user/login");
+    }
+  }, [username]);
   return (
     <>
       <Navbar items={item} routes={routes} />
