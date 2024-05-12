@@ -6,6 +6,10 @@ import cors from 'cors';
 import { PORT, mongoDBURL, jwtSecret } from './config.js';
 import { User } from './models/User.js';
 import { Courses } from './models/Courses.js';
+import { Admin } from './models/admin.js';
+import { Order } from './models/order.js';
+
+
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -60,67 +64,26 @@ each course has a count of enrollments
 1. auth
 */
 
-// get course by id
-app.get('/courses/:id' /*, authenticateAndCheckUserType*/, async (req, res) => {
-    try {
-        const course = await Courses.findById(req.params.id);
-        if (!course) {
-            return res.status(404).json({ error: 'Course not found' });
-        }
-        res.status(200).json(course);
-    } catch (error) {
-        res.status(500).json({ error: 'Error retrieving course' });
-    }
-});
-
 app.get('/instructor/courses/:username'/*, authenticateAndCheckUserType*/, async (req, res) => {
-    try {// return all courses of teacher 
+    try {// return all courses of teacher
         const courses = await Courses.find({ teacher_username: req.params.username });
-        // get length of courses field "enrollments"
         res.status(200).json({ count: courses.length, list: courses });
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: 'Error retrieving courses' });
     }
 });
-// app.post('/instructor/createCourse'/*, authenticateAndCheckUserType*/, async (req, res) => {
-//     try {
-//         const { title, description, price, imageUrl, teacher_username, enrollments, materials } = req.body;
-//         // Validate the input data
-//         if (!title || !price || !teacher_username || !imageUrl) {
-//             return res.status(400).send({ error: 'Missing required fields' });
-//         }
-//         // Create a nesw course
-
-// const courseMaterialsArray = Array.isArray(materials) ? materials : [materials];
-//         const course = await Courses.create({
-//             title,
-//             description,
-//             price,
-//             image: imageUrl,
-//             teacher_username,
-//             enrollments,
-//             courseMaterials: courseMaterialsArray
-//         });
-//         console.log("Sending course:");
-//         console.log(course);
-//         res.status(201).send(course);
-//     }
-//     catch (error) {
-//         console.error(error);
-//         res.status(500).send({ error: 'Error creating course' });
-//     }
-// });
 
 app.post('/instructor/createCourse'/*, authenticateAndCheckUserType*/, async (req, res) => {
     try {
         const { title, description, price, image, enrollments, courseMaterials } = req.body;
         const username = req.body.teacher_username;
+
         // Validate the input data
         if (!title || !price || !username) {
             return res.status(400).send({ error: 'Missing required fields' });
         }
-        const courseMaterialsArray = Array.isArray(courseMaterials) ? courseMaterials : [courseMaterials];
+
         // Create a new course
         const course = await Courses.create({
             title,
@@ -129,13 +92,13 @@ app.post('/instructor/createCourse'/*, authenticateAndCheckUserType*/, async (re
             image,
             teacher_username: username,
             enrollments,
-            courseMaterials: courseMaterialsArray
+            courseMaterials
         });
 
         res.status(201).send(course);
     }
     catch (error) {
-        console.log(error);;
+        console.error(error);
         res.status(500).send({ error: 'Error creating course' });
     }
 });
@@ -188,6 +151,151 @@ app.delete('/instructor/deleteCourse/:id' /*, authenticateAndCheckUserType*/, as
     catch (error) {
         console.error(error);
         res.status(500).send({ error: 'Error deleting course' });
+    }
+});
+
+app.post('/Courses/checkout/:id', async (req, res) => {
+    try {
+        const { username, course_id, price, status } = req.body;
+        const newOrder = await Order.create({ username, course_id, price, status });
+        res.status(201).json(newOrder);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error creating order' });
+    }
+});
+
+app.post('/admin', async (req, res) => {
+    try {
+        const { username, password, email } = req.body;
+        // Hash the password
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const admin = new Admin({ username, password: hashedPassword, email });
+        await admin.save();
+        res.status(201).json(admin);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error creating admin' });
+    }
+});
+
+// Get all admins
+app.get('/admin', async (req, res) => {
+    try {
+        const admins = await Admin.find();
+        res.status(200).json(admins);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error getting admins' });
+    }
+});
+
+// Get admin by ID
+app.get('/admin/:id', async (req, res) => {
+    try {
+        const admin = await Admin.findById(req.params.id);
+        if (!admin) {
+            return res.status(404).json({ error: 'Admin not found' });
+        }
+        res.status(200).json(admin);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error getting admin' });
+    }
+});
+
+// Update admin by ID
+app.put('/admin/:id', async (req, res) => {
+    try {
+        const { username, password, email } = req.body;
+        const hashedPassword = await bcrypt.hash(password, 10);
+        const updatedAdmin = await Admin.findByIdAndUpdate(req.params.id, { username, password: hashedPassword, email }, { new: true });
+        if (!updatedAdmin) {
+            return res.status(404).json({ error: 'Admin not found' });
+        }
+        res.status(200).json(updatedAdmin);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error updating admin' });
+    }
+});
+
+// Delete admin by ID
+app.delete('/admin/:id', async (req, res) => {
+    try {
+        const deletedAdmin = await Admin.findByIdAndDelete(req.params.id);
+        if (!deletedAdmin) {
+            return res.status(404).json({ error: 'Admin not found' });
+        }
+        res.status(200).json(deletedAdmin);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error deleting admin' });
+    }
+});
+
+app.post('/Courses/checkout/:id', async (req, res) => {
+    try {
+        const { username, price } = req.body;
+        const course_id = req.params.id;
+
+        // Check if the course exists
+        const course = await Course.findById(course_id);
+        if (!course) {
+            return res.status(404).json({ error: 'Course not found' });
+        }
+
+        // Create a new order
+        const newOrder = await Order.create({ username, course_id, price, status: 'Pending' });
+
+        res.status(201).json(newOrder);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error creating order' });
+    }
+});
+
+// Admin approval route
+app.put('/admin/orders/:id/approve', async (req, res) => {
+    try {
+        const orderId = req.params.id;
+
+        // Find the order by ID
+        const order = await Order.findById(orderId);
+        if (!order) {
+            return res.status(404).json({ error: 'Order not found' });
+        }
+
+        // Update the order status to 'Approved'
+        order.status = 'Approved';
+        await order.save();
+
+        res.status(200).json(order);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error approving order' });
+    }
+});
+
+// Admin disapproval route
+app.put('/admin/orders/:id/disapprove', async (req, res) => {
+    try {
+        const orderId = req.params.id;
+
+        // Find the order by ID
+        const order = await Order.findById(orderId);
+        if (!order) {
+            return res.status(404).json({ error: 'Order not found' });
+        }
+
+        // Update the order status to 'Disapproved'
+        order.status = 'Disapproved';
+        await order.save();
+
+        res.status(200).json(order);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error disapproving order' });
     }
 });
 
