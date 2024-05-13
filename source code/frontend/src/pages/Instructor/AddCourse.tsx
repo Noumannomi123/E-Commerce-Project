@@ -1,14 +1,17 @@
 import axios from "axios";
 import AddCourseForm from "../../components/AddCourseForm";
 import Navbar from "../../components/Navbar";
+import { useLocation } from "react-router-dom";
 interface CourseMaterial {
   title: string;
   type: string;
   url: string;
 }
 const AddCourse = () => {
+  const { state } = useLocation();
+  const { username } = state;
   const item: string[] = ["Home", "Add Courses"];
-  const routes = ["/Instructor/Home", "/Instructor/AddCourse"];
+  const routes = ["/Instructor/Home", `/Instructor/AddCourse/${username}`];
 
   const courseMaterial: CourseMaterial[] = [
     { title: "", type: "Link", url: "" },

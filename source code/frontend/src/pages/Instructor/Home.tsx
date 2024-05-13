@@ -174,7 +174,7 @@ const Home = () => {
                 <Box w="40%">
                   {/* <Image src={course.image} w="100%" /> */}
                   {course.image ? (
-                    <Image src={course.image} w="100%" />
+                    <Image src={course.image} w="100%"/>
                   ) : (
                     <Image
                       src={default_pic} // Replace default_pic with the URL of your default image

@@ -1,11 +1,10 @@
 import axios from "axios";
 import { useNavigate } from "react-router-dom";
 const Logout = () => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
   const handleLogout = async () => {
     try {
       await axios.get("/user/logout");
-      localStorage.removeItem("username");
       navigate("/user/login");
     } catch (error) {
       alert("Unable to login.");
