@@ -244,6 +244,17 @@ app.get('/user/getUsers', async (req, res) => {
     }
 });
 
+app.post('quiz/createQuiz', async (req, res) => { // create quiz
+    try {
+        const { title, questions } = req.body;
+        const quiz = await Quiz.create({ title, questions });
+        res.status(201).json(quiz);
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ error: 'Error creating quiz' });
+    }
+});
+
 mongoose
     .connect(mongoDBURL)
     .then(() => {
