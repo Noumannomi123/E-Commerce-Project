@@ -51,14 +51,7 @@ app.get('/user/logout', (req, res) => {
     res.clearCookie('jwt');
     res.status(200).json({ message: 'Logged out successfully' });
 })
-// Protected route example
-// create courses
-/* 
-instructor creates a course
-each course has a teacher_username to identify the course
-each course has a count of enrollments
-1. auth
-*/
+
 
 // get course by id
 app.get('/courses/:id' /*, authenticateAndCheckUserType*/, async (req, res) => {
@@ -83,34 +76,7 @@ app.get('/instructor/courses/:username'/*, authenticateAndCheckUserType*/, async
         res.status(500).json({ error: 'Error retrieving courses' });
     }
 });
-// app.post('/instructor/createCourse'/*, authenticateAndCheckUserType*/, async (req, res) => {
-//     try {
-//         const { title, description, price, imageUrl, teacher_username, enrollments, materials } = req.body;
-//         // Validate the input data
-//         if (!title || !price || !teacher_username || !imageUrl) {
-//             return res.status(400).send({ error: 'Missing required fields' });
-//         }
-//         // Create a nesw course
 
-// const courseMaterialsArray = Array.isArray(materials) ? materials : [materials];
-//         const course = await Courses.create({
-//             title,
-//             description,
-//             price,
-//             image: imageUrl,
-//             teacher_username,
-//             enrollments,
-//             courseMaterials: courseMaterialsArray
-//         });
-//         console.log("Sending course:");
-//         console.log(course);
-//         res.status(201).send(course);
-//     }
-//     catch (error) {
-//         console.error(error);
-//         res.status(500).send({ error: 'Error creating course' });
-//     }
-// });
 
 app.post('/instructor/createCourse'/*, authenticateAndCheckUserType*/, async (req, res) => {
     try {
@@ -230,19 +196,22 @@ app.get('/', (req, res) => {
     res.send('Hello World');
 });
 
-app.get('/user/getUsers', async (req, res) => {
+
+app.get('/getCourses', async (req, res) => {
     try {
-        const users = await User.find({});
+        const courses = await Courses.find({});
         return res.status(200).json({
-            count: users.length,
-            data: users
+            count: courses.length,
+            data: courses
         });
     }
     catch (error) {
         console.log(error.message);
-        res.status(500).send({ message: error.message });
+        return res.status(500).json({ message: error.message });
     }
 });
+
+
 
 mongoose
     .connect(mongoDBURL)
