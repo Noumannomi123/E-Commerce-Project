@@ -18,8 +18,8 @@ import {
   Text,
   VStack,
 } from "@chakra-ui/react";
-import user from "../../assets/user.png";
 import { ArrowDownIcon } from "@chakra-ui/icons";
+import user from "../../assets/user.png";
 import axios from "axios";
 
 interface Course {
@@ -43,6 +43,13 @@ const Home = () => {
   const { state } = useLocation();
   const { username } = state;
 
+  const navigate = useNavigate();
+  useEffect(() => {
+    if (!username) {
+      navigate("/user/login");
+    }
+  }, [username]);
+  
   const [count, setCount] = useState(0);
   const [list, setList] = useState([]);
   const leastDestructiveRef = useRef(null); // Create a ref for the least destructive element
@@ -57,13 +64,6 @@ const Home = () => {
       console.log(error);
     }
   };
-
-  const navigate = useNavigate();
-  useEffect(() => {
-    if (!username) {
-      navigate("/user/login");
-    }
-  }, [username]);
   const courses = getCourses(username);
   console.log(courses);
   useEffect(() => {
@@ -83,7 +83,7 @@ const Home = () => {
   const editCourse = (id: string) => {
     const listing = list.find((course: Course) => course._id === id);
     navigate(`/Instructor/EditCourse/${id}`, {
-      state: { listing: listing , username: username},
+      state: { listing: listing, username: username },
     });
   };
   const deleteCourse = async (id: string) => {
@@ -174,7 +174,7 @@ const Home = () => {
                 <Box w="40%">
                   {/* <Image src={course.image} w="100%" /> */}
                   {course.image ? (
-                    <Image src={course.image} w="100%"/>
+                    <Image src={course.image} w="100%" />
                   ) : (
                     <Image
                       src={default_pic} // Replace default_pic with the URL of your default image

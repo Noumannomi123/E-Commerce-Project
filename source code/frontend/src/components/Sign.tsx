@@ -30,9 +30,9 @@ const Signup = (props: Props) => {
     <>
       <div className="d-flex justify-content-center align-items-center bg-body-tertiary py-4 vh-100">
         <div className="form-signin w-25 m-25 text-center ">
-          <form className="col-12" onSubmit={handleSubmit}>
+          <form className="col-12 " onSubmit={handleSubmit}>
             <h1 className="h3 mb-3 fw-normal">{props.heading}</h1>
-            <img src={logo} alt="Logo" height={200} width={200} />
+            <img src={logo} alt="Logo" height={200} width={200}  className="mx-auto" />
             <div className="form-floating">
               <input
                 type="text"

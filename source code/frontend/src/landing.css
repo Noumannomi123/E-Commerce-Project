@@ -8,6 +8,7 @@ body {
     max-width: 1200px;
     margin: 0 auto;
     padding: 20px;
+    
 }
 
 header {
@@ -57,7 +58,7 @@ footer {
 button {
     padding: 10px 20px;
     background-color: #007bff;
-    color: white;
+    color: black;
     border: none;
     border-radius: 5px;
     cursor: pointer;
@@ -65,5 +66,5 @@ button {
 }
 
 button:hover {
-    background-color: #0056b3;
+    background-color: #b8b3d6;
 }

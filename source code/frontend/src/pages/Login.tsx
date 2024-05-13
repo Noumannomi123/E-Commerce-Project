@@ -20,11 +20,18 @@ const Login = () => {
       });
       const { data } = response;
       // localStorage.setItem("username", data.username);
-      if (usertype === "Instructor") navigate("/Instructor/Home",{
-        state: {username: data.username}
-      });
-      if (usertype === "Student") navigate("/Student/Home");
-      if (usertype === "Admin") navigate("/Admin/Home");
+      if (usertype === "Instructor")
+        navigate("/Instructor/Home", {
+          state: { username: data.username },
+        });
+      if (usertype === "Student")
+        navigate("/Student/Home", {
+          state: { username: data.username },
+        });
+      if (usertype === "Admin")
+        navigate("/Admin/Home", {
+          state: { username: data.username },
+        });
     } catch (error: any) {
       console.log(error);
       if (error.response?.request.status === 404) alert("User not found");
