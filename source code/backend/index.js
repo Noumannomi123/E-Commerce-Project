@@ -5,7 +5,11 @@ import jwt from 'jsonwebtoken';
 import cors from 'cors';
 import { PORT, mongoDBURL, jwtSecret } from './config.js';
 import { User } from './models/User.js';
+import { Quiz } from './models/quiz.js';
 import { Courses } from './models/Courses.js';
+import multer from 'multer';
+const upload = multer({ dest: 'uploads/' });
+
 const app = express();
 app.use(express.json());
 app.use(cors());
@@ -155,6 +159,68 @@ app.delete('/instructor/deleteCourse/:id' /*, authenticateAndCheckUserType*/, as
         console.error(error);
         res.status(500).send({ error: 'Error deleting course' });
     }
+});
+
+
+app.post('instructor/createQuiz', (req, res) => {
+    const quiz = new Quiz({
+        title: req.body.title,
+        courseid: req.body.courseid,
+        questions: req.body.questions
+    });
+
+    quiz.save()
+        .then(result => {
+            res.status(201).json({
+                message: "Quiz created successfully",
+                quiz: result
+            });
+        })
+        .catch(err => {
+            res.status(500).json({
+                error: err
+            });
+        });
+});
+
+app.get('/quiz/getQuizzes', async (req, res) => {
+    try {
+        // Find all quizzes
+        const quizzes = await Quiz.find();
+        if (!quizzes) {
+            return res.status(404).json({ error: 'No quizzes found' });
+        }
+        res.status(200).json(quizzes);
+    } catch (error) {
+        res.status(500).json({ error: 'Error retrieving quizzes' });
+    }
+});
+
+let uploadedFiles = [];
+
+app.post('/upload', upload.single('file'), (req, res) => {
+    if (!req.file) {
+        return res.status(400).send('No file uploaded.');
+    }
+
+    const originalExtension = req.file.originalname.split('.').pop();
+
+    uploadedFiles.push({
+        originalname: req.file.originalname,
+        mimetype: req.file.mimetype,
+        size: req.file.size,
+        path: req.file.path,
+        filename: req.file.filename + '.' + originalExtension
+    });
+
+    res.send('File uploaded successfully.');
+});
+
+
+// GET route to retrieve uploaded files information
+app.get('/files', (req, res) => {
+    res.json(uploadedFiles);
+    res.send('File uploaded successfully.');
 });
 
 // Middleware to authenticate token
